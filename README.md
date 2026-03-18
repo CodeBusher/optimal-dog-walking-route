@@ -15,10 +15,10 @@ The walking environment is modeled as a **weighted directed graph**:
 - **Edge weights** combine travel time and rewards into a single cost:
 
 ```
-final_weight = time_cost - edge_reward - destination_node_reward
+edge.final_weight = time_cost - edge_reward - destination_node_reward
 ```
 
-A lower (or more negative) weight means a more desirable path. The **Bellman-Ford algorithm** finds the path with the lowest total weight from a given start point, effectively maximizing the walking experience while keeping travel time reasonable.
+A lower (or more negative) `final_weight` means a more desirable path. The **Bellman-Ford algorithm** finds the path with the lowest total weight from a given start point, effectively maximizing the walking experience while keeping travel time reasonable.
 
 ### Reward Scale
 
