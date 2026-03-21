@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {"node_id": 0, "name": "Home",         "node_type": "home",         "reward":   0, "x": 0.0, "y": 0.0},
+    {"node_id": 1, "name": "Main St",      "node_type": "intersection", "reward":   0, "x": 3.0, "y": 0.0},
+    {"node_id": 2, "name": "Elm Park",     "node_type": "park",         "reward":   8, "x": 1.5, "y": 3.0},
+    {"node_id": 3, "name": "Construction", "node_type": "trigger_zone", "reward": -10, "x": 5.0, "y": 2.0},
+    {"node_id": 4, "name": "Dog Café",     "node_type": "rest_stop",    "reward":   2, "x": 6.0, "y": 0.0}
+  ],
+  "edges": [
+    {"from_id": 0, "to_id": 1, "time_cost": 3.0, "edge_reward": 0.0},
+    {"from_id": 0, "to_id": 2, "time_cost": 6.0, "edge_reward": 1.0},
+    {"from_id": 1, "to_id": 3, "time_cost": 2.0, "edge_reward": 0.0},
+    {"from_id": 1, "to_id": 4, "time_cost": 5.0, "edge_reward": 0.0},
+    {"from_id": 2, "to_id": 4, "time_cost": 4.0, "edge_reward": 1.0},
+    {"from_id": 3, "to_id": 4, "time_cost": 1.0, "edge_reward": 0.0}
+  ]
+}
