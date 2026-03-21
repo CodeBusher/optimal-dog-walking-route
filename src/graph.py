@@ -19,12 +19,7 @@ class Graph:
         self.nodes[node.node_id] = node
 
     def add_edge(self, edge: Edge) -> None:
-        """Add a directed, weighted connection.
-
-        Computes ``edge.final_weight`` using the destination node's reward::
-
-            final_weight = time_cost - edge_reward - dest_node.reward
-        """
+        """Add a directed, weighted connection."""
         dest_node = self.nodes[edge.to_id]
         edge.final_weight = edge.time_cost - edge.edge_reward - dest_node.reward
         self.edges.append(edge)
