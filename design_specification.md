@@ -35,6 +35,8 @@ class Node:
     reward: float = 0.0     # node-level reward applied to ALL edges
                             # entering this node
                             # -10 for trigger zones, 0-10 for others
+    x: float | None = None  # optional spatial coordinate
+    y: float | None = None  # optional spatial coordinate
 
 
 @dataclass
@@ -84,7 +86,9 @@ class Graph:
               "node_id": 0,
               "name": "Home",
               "node_type": "home",
-              "reward": 0
+              "reward": 0,
+              "x": 0.0,
+              "y": 0.0
             }
           ],
           "edges": [
@@ -150,12 +154,12 @@ def _build_sample_graph() -> Graph:
     """
     A 5-node graph for hand-verified tests.
 
-    Nodes:
-      0  Home            (reward  0)
-      1  Main St         (reward  0)   intersection
-      2  Elm Park        (reward  8)   park — great for dogs
-      3  Construction    (reward -10)  trigger zone
-      4  Dog Café        (reward  2)   rest stop
+    Nodes (with spatial coordinates):
+      0  Home            (reward  0)   home          @ (0, 0)
+      1  Main St         (reward  0)   intersection  @ (3, 0)
+      2  Elm Park        (reward  8)   park          @ (1.5, 3)
+      3  Construction    (reward -10)  trigger zone  @ (5, 2)
+      4  Dog Café        (reward  2)   rest stop     @ (6, 0)
 
     Edges (from -> to, time_cost, edge_reward):
       0 -> 1   3 min,  reward 0    net = 3 - 0 - 0  =  3
@@ -171,11 +175,11 @@ def _build_sample_graph() -> Graph:
       0 → 1 → 3 → 4: 3 + 12 + (-1) = 14  (trigger zone kills it)
     """
     g = Graph()
-    g.add_node(Node(0, "Home",          "home",         reward=0))
-    g.add_node(Node(1, "Main St",       "intersection", reward=0))
-    g.add_node(Node(2, "Elm Park",      "park",         reward=8))
-    g.add_node(Node(3, "Construction",  "trigger_zone", reward=-10))
-    g.add_node(Node(4, "Dog Café",      "rest_stop",    reward=2))
+    g.add_node(Node(0, "Home",          "home",         reward=0,   x=0.0, y=0.0))
+    g.add_node(Node(1, "Main St",       "intersection", reward=0,   x=3.0, y=0.0))
+    g.add_node(Node(2, "Elm Park",      "park",         reward=8,   x=1.5, y=3.0))
+    g.add_node(Node(3, "Construction",  "trigger_zone", reward=-10, x=5.0, y=2.0))
+    g.add_node(Node(4, "Dog Café",      "rest_stop",    reward=2,   x=6.0, y=0.0))
 
     g.add_edge(Edge(0, 1, time_cost=3, edge_reward=0))
     g.add_edge(Edge(0, 2, time_cost=6, edge_reward=1))
@@ -195,3 +199,60 @@ For `_build_sample_graph()` with `source=0`, `dest=4`:
 | `dist[4]` | `-2` |
 | `reconstruct_path` | `[0, 2, 4]` |
 | `has_negative_cycle` | `False` |
+
+---
+
+## 5. Frontend (`app.py`)
+
+A Streamlit-based interactive dashboard for loading graphs, selecting routes, and visualising the optimal path computed by Bellman-Ford.
+
+### UI Layout
+
+```
+┌─────────────────┬──────────────────────────────────────────┐
+│  Sidebar         │  Main Content                            │
+│                  │                                          │
+│  Graph Data      │  Title + description                     │
+│  ○ Sample data   │                                          │
+│  ○ Upload JSON   │  ┌──────────────────────────────────┐    │
+│                  │  │  Route Map (matplotlib + networkx)│    │
+│  Route Selection │  │  — nodes coloured by type          │    │
+│  Start: [____]   │  │  — optimal path highlighted gold   │    │
+│  Dest:  [____]   │  │  — edge weights labelled           │    │
+│                  │  └──────────────────────────────────┘    │
+│  Legend           │                                          │
+│  ● Home           │  Metrics: Cost | Time | Rewards | Stops │
+│  ● Park           │                                          │
+│  ● Intersection   │  Step-by-step breakdown (expanders)     │
+│  ● Rest Stop      │                                          │
+│  ● Trigger Zone   │  Data tables (All Nodes / All Edges)    │
+│  ● Trail          │                                          │
+└─────────────────┴──────────────────────────────────────────┘
+```
+
+### Key Design Choices
+
+- **Session state:** The loaded `Graph` instance is stored in `st.session_state.graph`, allowing future phases to mutate it in-place without reloading from disk.
+- **Visualisation:** When nodes have `x, y` coordinates, the map uses their real spatial positions; otherwise it falls back to `networkx.spring_layout`. `matplotlib` renders nodes, edges, labels, and the highlighted path. The rendering function (`create_graph_figure`) is decoupled from the UI so it can be reused or swapped for plotly later.
+- **All-destinations overview:** Bellman-Ford computes optimal costs from the source to every node in a single run. A ranked table shows all reachable destinations sorted by cost, directly showcasing the algorithm's single-source shortest-path output.
+- **Helper functions:** Graph loading (`load_graph_from_dict`) and networkx conversion (`_to_nx`) are isolated from the Streamlit UI code to support reuse and testing.
+- **Error handling:** Invalid JSON uploads, unreachable destinations, same source/destination, and negative cycles are all handled with user-friendly messages.
+
+### Node Colour Mapping
+
+| Node Type | Colour | Hex |
+|-----------|--------|-----|
+| home | Blue | `#4A90D9` |
+| park | Green | `#27AE60` |
+| intersection | Grey | `#95A5A6` |
+| rest_stop | Orange | `#F39C12` |
+| trigger_zone | Red | `#E74C3C` |
+| trail | Light Green | `#2ECC71` |
+
+### Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `streamlit` | Web UI framework |
+| `networkx` | Graph layout computation |
+| `matplotlib` | Graph rendering |
