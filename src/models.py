@@ -7,10 +7,10 @@ from dataclasses import dataclass
 class Node:
     node_id: int
     name: str
-    node_type: str  # "home" | "park" | "intersection" | "rest_stop" | "trigger_zone" | "trail"
+    node_type: str  # e.g. "home", "park", "intersection", "rest_stop", "trigger_zone", "trail"
     reward: float = 0.0
-    x: float | None = None
-    y: float | None = None
+    x: float | None = None  # auto-generated via spring layout when not provided
+    y: float | None = None  # auto-generated via spring layout when not provided
 
 
 @dataclass
