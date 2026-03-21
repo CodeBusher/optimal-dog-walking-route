@@ -19,4 +19,4 @@ class Edge:
     to_id: int
     time_cost: float
     edge_reward: float
-    final_weight: float | None = None
+    final_weight: float | None = None  # computed by Graph.add_edge: time_cost - edge_reward - dest.reward
