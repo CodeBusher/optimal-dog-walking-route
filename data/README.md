@@ -6,12 +6,12 @@ This folder contains all graph data for the Optimal Dog Walking Route project.
 
 ```
 data/
-├── sample_data.json          ← original 5-node example (used by app.py default)
-├── sample_data/              ← richer hand-crafted scenarios
-│   ├── urban_downtown.json        20 nodes, 32 edges — dense city block
-│   ├── suburban_park_district.json 20 nodes, 30 edges — quiet suburb with parks/trails
-│   └── large_city_loop.json       30 nodes, 55 edges — mixed urban + suburban
-└── real_locations/           ← placeholder for future real-world OSM data
+├── sample_data.json          ← original 5-node example (default in app)
+├── sample_data/              ← hand-crafted scenarios
+│   ├── urban_downtown.json             20 nodes, 31 edges — dense city block
+│   ├── suburban_park_district.json     20 nodes, 30 edges — quiet suburb with parks/trails
+│   └── large_city_loop.json            30 nodes, 55 edges — mixed urban + suburban
+└── README.md                 ← this file
 ```
 
 ---
@@ -71,9 +71,9 @@ Every JSON file must have two top-level arrays: `nodes` and `edges`.
 ## How to Load a Dataset
 
 ### In the Streamlit app
-1. Run `streamlit run app.py`
-2. In the sidebar, select **Upload JSON**
-3. Upload any `.json` file from `data/sample_data/`
+Two options in the sidebar:
+- **Sample data** — select from a dropdown that auto-discovers all `.json` files in `data/` and `data/sample_data/`. Default is `sample_data`.
+- **Upload JSON** — upload any `.json` file that follows the schema above.
 
 ### Programmatically
 ```python
@@ -100,17 +100,16 @@ print(g.get_edge_count())   # 32
 
 ---
 
-## real_locations/ folder
+## Phase 2 Notes
 
-Reserved for future hand-crafted JSON files based on real-world locations.
-Follow the same JSON schema — assign `x`, `y` as spatial coordinates and
-`time_cost` based on real walking distances (~83 m/min walking speed).
-
----
-
-## Phase 2 Note
-
-Planned: allow users to override node/edge rewards per their dog's individual
-preferences (e.g. a dog that dislikes dog parks). This will require a new
+**1. Per-dog reward customization**
+Allow users to override node/edge rewards based on their dog's individual
+preferences (e.g. a dog that dislikes dog parks). Requires a new
 `update_node` method in `src/graph.py` and UI inputs in `app.py`.
 The JSON schema will remain unchanged.
+
+**2. Real location graph generation**
+Allow users to generate a walking graph from a real-world address using
+OpenStreetMap data (`osmnx`). The app would fetch the street network and
+nearby POIs (parks, cafes, trails) around the entered location and convert
+them into the existing JSON schema automatically, without saving any files.
