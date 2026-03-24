@@ -19,3 +19,6 @@ Thumbs.db
 
 # Local planning (do not push)
 plan.md
+
+# Streamlit cache
+cache/
