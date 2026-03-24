@@ -18,6 +18,20 @@ from src.models import Edge, Node
 
 SAMPLE_DATA_PATH = Path("data/sample_data.json")
 
+def _discover_sample_files() -> dict[str, Path]:
+    """Scan data/ and data/sample_data/ for JSON files.
+
+    Returns an ordered dict mapping display name -> Path,
+    with sample_data.json first.
+    """
+    files: dict[str, Path] = {}
+    default = SAMPLE_DATA_PATH
+    if default.exists():
+        files[default.stem] = default
+    for p in sorted(Path("data/sample_data").glob("*.json")):
+        files[p.stem] = p
+    return files
+
 PATH_COLOR = "#F1C40F"
 
 DEFAULT_NODE_COLOR = "#8E44AD"
@@ -249,12 +263,20 @@ with st.sidebar:
     )
 
     if data_source == "Sample data":
-        if SAMPLE_DATA_PATH.exists():
-            g = Graph()
-            g.load_from_json(str(SAMPLE_DATA_PATH))
-            st.session_state.graph = g
+        sample_files = _discover_sample_files()
+        if not sample_files:
+            st.error("No sample data files found in data/.")
         else:
-            st.error(f"Sample data not found at `{SAMPLE_DATA_PATH}`.")
+            names = list(sample_files.keys())
+            selected = st.selectbox(
+                "Choose dataset",
+                names,
+                index=0,
+            )
+            chosen_path = sample_files[selected]
+            g = Graph()
+            g.load_from_json(str(chosen_path))
+            st.session_state.graph = g
     else:
         uploaded = st.file_uploader("Upload a JSON file", type=["json"])
         if uploaded is not None:

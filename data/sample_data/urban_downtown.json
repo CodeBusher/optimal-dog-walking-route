@@ -45,7 +45,6 @@
     {"from_id": 10, "to_id": 11, "time_cost": 3.0, "edge_reward":  2.0},
     {"from_id": 10, "to_id": 16, "time_cost": 3.0, "edge_reward":  1.0},
     {"from_id": 11, "to_id": 12, "time_cost": 2.0, "edge_reward":  2.0},
-    {"from_id": 11, "to_id": 17, "time_cost": 3.0, "edge_reward":  1.0},
     {"from_id": 12, "to_id": 14, "time_cost": 2.0, "edge_reward":  2.0},
     {"from_id": 13, "to_id": 15, "time_cost": 3.0, "edge_reward": -1.0},
     {"from_id": 14, "to_id": 15, "time_cost": 3.0, "edge_reward":  2.0},
